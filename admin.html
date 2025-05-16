@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Legendários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #ff6600;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .sidebar {
+            background-color: #333;
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            margin: 5px 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: #ff6600;
+            color: white;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .header {
+            background-color: #ff6600;
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .risk-verde {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .risk-amarelo {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .risk-vermelho {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header bg-dark text-white text-center">
+                    <h3>Legendários - Acesso Administrativo</h3>
+                </div>
+                <div class="card-body">
+                    <form id="loginForm" onsubmit="return login()">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nome de usuário</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                        <div class="alert alert-danger mt-3" id="login-error" style="display: none;">
+                            Credenciais inválidas. Tente novamente.
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="index.html">Voltar para a página inicial</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-panel" style="display: none;">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-2 sidebar">
+                    <div class="text-center mb-4">
+                        <h4>Legendários</h4>
+                        <p>Triagem Médica</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showDashboard()">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showParticipantes()">
+                                <i class="fas fa-users me-2"></i> Participantes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showEventos()">
+                                <i class="fas fa-calendar-alt me-2"></i> Eventos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showNotificacoes()">
+                                <i class="fas fa-bell me-2"></i> Notificações
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showConfiguracoes()">
+                                <i class="fas fa-cog me-2"></i> Configurações
+                            </a>
+                        </li>
+                        <li class="nav-item mt-5">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-2"></i> Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="col-md-9 col-lg-10 main-content">
+                    <div class="header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4>Painel Administrativo</h4>
+                            <div>
+                                <span>Bem-vindo, <span id="admin-name">Admin</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Overview -->
+                    <div id="dashboard-content">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Total de Participantes</h5>
+                                        <h2 class="card-text" id="total-participantes">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Risco Vermelho</h5>
+                                        <h2 class="card-text" id="total-vermelho">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Risco Amarelo</h5>
+                                        <h2 class="card-text" id="total-amarelo">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Participants Table -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Lista de Participantes</h5>
+                                <div>
+                                    <button class="btn btn-success btn-sm" onclick="exportarDados()">
+                                        <i class="fas fa-file-export me-1"></i> Exportar Dados
+                                    </button>
+                                    <button class="btn btn-danger btn-sm ms-2" onclick="zerarDados()">
+                                        <i class="fas fa-trash me-1"></i> Zerar Dados
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                                <th>Idade</th>
+                                                <th>Risco</th>
+                                                <th>Telefone</th>
+                                                <th>Email</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="participantes-table">
+                                            <!-- Dados serão carregados via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Participantes Content -->
+                    <div id="participantes-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Gerenciamento de Participantes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-success" onclick="filtrarPorRisco('verde')">Verde</button>
+                                        <button type="button" class="btn btn-outline-warning" onclick="filtrarPorRisco('amarelo')">Amarelo</button>
+                                        <button type="button" class="btn btn-outline-danger" onclick="filtrarPorRisco('vermelho')">Vermelho</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="filtrarPorRisco('todos')">Todos</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                                <th>Idade</th>
+                                                <th>Risco</th>
+                                                <th>Problemas Cardíacos</th>
+                                                <th>Medicamentos</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="participantes-table-filtrado">
+                                            <!-- Dados serão carregados via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Eventos Content -->
+                    <div id="eventos-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Gerenciamento de Eventos</h5>
+                                <button class="btn btn-primary btn-sm" onclick="novoEvento()">
+                                    <i class="fas fa-plus me-1"></i> Novo Evento
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                                <th>Data</th>
+                                                <th>Local</th>
+                                                <th>Participantes</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Desafio Legendários #924</td>
+                                                <td>15 a 18 de Junho de 2025</td>
+                                                <td>Serra da Mantiqueira, SP</td>
+                                                <td>0</td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">Editar</button>
+                                                    <button class="btn btn-sm btn-danger">Excluir</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Desafio Legendários #925</td>
+                                                <td>10 a 13 de Agosto de 2025</td>
+                                                <td>Chapada dos Veadeiros, GO</td>
+                                                <td>0</td>
+                                                <td><span class="badge bg-secondary">Planejado</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary">Editar</button>
+                                                    <button class="btn btn-sm btn-danger">Excluir</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notificações Content -->
+                    <div id="notificacoes-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Envio de Notificações</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="notificacao-tipo" class="form-label">Tipo de Notificação</label>
+                                        <select class="form-select" id="notificacao-tipo">
+                                            <option value="todos">Todos os Participantes</option>
+                                            <option value="vermelho">Participantes com Risco Vermelho</option>
+                                            <option value="amarelo">Participantes com Risco Amarelo</option>
+                                            <option value="verde">Participantes com Risco Verde</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="notificacao-titulo" class="form-label">Título</label>
+                                        <input type="text" class="form-control" id="notificacao-titulo">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="notificacao-mensagem" class="form-label">Mensagem</label>
+                                        <textarea class="form-control" id="notificacao-mensagem" rows="5"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="enviar-email" checked>
+                                            <label class="form-check-label" for="enviar-email">Enviar por E-mail</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="enviar-whatsapp" checked>
+                                            <label class="form-check-label" for="enviar-whatsapp">Enviar por WhatsApp</label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="enviarNotificacao()">Enviar Notificação</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações Content -->
+                    <div id="configuracoes-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Configurações do Sistema</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <h6 class="mb-3">Configurações de Conta</h6>
+                                    <div class="mb-3">
+                                        <label for="config-nome" class="form-label">Nome do Administrador</label>
+                                        <input type="text" class="form-control" id="config-nome" value="Admin">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="config-email" class="form-label">E-mail</label>
+                                        <input type="email" class="form-control" id="config-email" value="admin@legendarios.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="config-senha" class="form-label">Nova Senha</label>
+                                        <input type="password" class="form-control" id="config-senha">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="config-senha-confirma" class="form-label">Confirmar Nova Senha</label>
+                                        <input type="password" class="form-control" id="config-senha-confirma">
+                                    </div>
+                                    
+                                    <h6 class="mb-3 mt-4">Configurações do Sistema</h6>
+                                    <div class="mb-3">
+                                        <label for="config-backup" class="form-label">Frequência de Backup Automático</label>
+                                        <select class="form-select" id="config-backup">
+                                            <option value="diario">Diário</option>
+                                            <option value="semanal" selected>Semanal</option>
+                                            <option value="mensal">Mensal</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="config-notificacoes" checked>
+                                            <label class="form-check-label" for="config-notificacoes">Notificações Automáticas</label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="salvarConfiguracoes()">Salvar Configurações</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dados de exemplo para demonstração
+        const dadosExemplo = [
+            {
+                id: 1,
+                nome: 'João Silva',
+                idade: 35,
+                peso: 78,
+                altura: 175,
+                telefone: '(11) 98765-4321',
+                email: 'joao@email.com',
+                problemas_cardiacos: 'Não',
+                cirurgias_previas: 'Apendicectomia em 2018',
+                medicamentos: 'Nenhum',
+                doencas_cerebrais: 'Não',
+                fraturas: 'Não',
+                dores_anginosas: 'Não',
+                risco: 'verde',
+                observacoes: 'Apto para participar do desafio'
+            },
+            {
+                id: 2,
+                nome: 'Maria Oliveira',
+                idade: 42,
+                peso: 65,
+                altura: 162,
+                telefone: '(11) 91234-5678',
+                email: 'maria@email.com',
+                problemas_cardiacos: 'Não',
+                cirurgias_previas: 'Não',
+                medicamentos: 'Anti-hipertensivo',
+                doencas_cerebrais: 'Não',
+                fraturas: 'Fratura no tornozelo em 2020',
+                dores_anginosas: 'Não',
+                risco: 'amarelo',
+                observacoes: 'Necessita avaliação médica devido ao uso de anti-hipertensivo'
+            },
+            {
+                id: 3,
+                nome: 'Carlos Santos',
+                idade: 28,
+                peso: 85,
+                altura: 180,
+                telefone: '(11) 99876-5432',
+                email: 'carlos@email.com',
+                problemas_cardiacos: 'Arritmia',
+                cirurgias_previas: 'Não',
+                medicamentos: 'Antiarrítmico',
+                doencas_cerebrais: 'Não',
+                fraturas: 'Não',
+                dores_anginosas: 'Sim, durante exercícios intensos',
+                risco: 'vermelho',
+                observacoes: 'Não recomendado para o desafio devido à arritmia e dores anginosas'
+            }
+        ];
+
+        // Credenciais de administrador
+        const adminCredentials = {
+            username: 'admin',
+            password: 'legendarios2025'
+        };
+
+        // Função de login
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-name').textContent = 'Admin';
+                
+                // Inicializar dados
+                inicializarDados();
+                return false;
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                return false;
+            }
+        }
+
+        // Função de logout
+        function logout() {
+            document.getElementById('login-page').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        // Inicializar dados
+        function inicializarDados() {
+            // Verificar se há dados no localStorage
+            let participantes = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            
+            // Se não houver dados, usar os dados de exemplo
+            if (participantes.length === 0) {
+                participantes = dadosExemplo;
+                localStorage.setItem('triagemSubmissions', JSON.stringify(participantes));
+            }
+            
+            // Atualizar contadores
+            atualizarContadores(participantes);
+            
+            // Preencher tabela de participantes
+            preencherTabelaParticipantes(participantes);
+            preencherTabelaParticipantesFiltrado(participantes);
+        }
+
+        // Atualizar contadores
+        function atualizarContadores(participantes) {
+            document.getElementById('total-participantes').textContent = participantes.length;
+            
+            const vermelhos = participantes.filter(p => p.risco === 'vermelho').length;
+            document.getElementById('total-vermelho').textContent = vermelhos;
+            
+            const amarelos = participantes.filter(p => p.risco === 'amarelo').length;
+            document.getElementById('total-amarelo').textContent = amarelos;
+        }
+
+        // Preencher tabela de participantes
+        function preencherTabelaParticipantes(participantes) {
+            const tabela = document.getElementById('participantes-table');
+            tabela.innerHTML = '';
+            
+            participantes.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.id}</td>
+                    <td>${p.nome}</td>
+                    <td>${p.idade}</td>
+                    <td><span class="risk-${p.risco}">${p.risco.toUpperCase()}</span></td>
+                    <td>${p.telefone}</td>
+                    <td>${p.email}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="verParticipante(${p.id})">Ver</button>
+                        <button class="btn btn-sm btn-warning" onclick="editarParticipante(${p.id})">Editar</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        // Preencher tabela de participantes filtrado
+        function preencherTabelaParticipantesFiltrado(participantes, filtro = 'todos') {
+            const tabela = document.getElementById('participantes-table-filtrado');
+            tabela.innerHTML = '';
+            
+            let participantesFiltrados = participantes;
+            if (filtro !== 'todos') {
+                participantesFiltrados = participantes.filter(p => p.risco === filtro);
+            }
+            
+            participantesFiltrados.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.id}</td>
+                    <td>${p.nome}</td>
+                    <td>${p.idade}</td>
+                    <td><span class="risk-${p.risco}">${p.risco.toUpperCase()}</span></td>
+                    <td>${p.problemas_cardiacos}</td>
+                    <td>${p.medicamentos}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="verParticipante(${p.id})">Ver</button>
+                        <button class="btn btn-sm btn-warning" onclick="editarParticipante(${p.id})">Editar</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        // Filtrar por risco
+        function filtrarPorRisco(risco) {
+            const participantes = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            preencherTabelaParticipantesFiltrado(participantes, risco);
+        }
+
+        // Exportar dados
+        function exportarDados() {
+            const participantes = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(participantes, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "participantes_legendarios.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            alert('Dados exportados com sucesso!');
+        }
+
+        // Zerar dados
+        function zerarDados() {
+            if (confirm('Tem certeza que deseja zerar todos os dados? Esta ação não pode ser desfeita.')) {
+                localStorage.removeItem('triagemSubmissions');
+                inicializarDados();
+                alert('Dados zerados com sucesso!');
+            }
+        }
+
+        // Ver participante
+        function verParticipante(id) {
+            const participantes = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            const participante = participantes.find(p => p.id === id);
+            
+            if (participante) {
+                alert(`Detalhes do Participante:
+Nome: ${participante.nome}
+Idade: ${participante.idade}
+Peso: ${participante.peso} kg
+Altura: ${participante.altura} cm
+Telefone: ${participante.telefone}
+Email: ${participante.email}
+Problemas Cardíacos: ${participante.problemas_cardiacos}
+Cirurgias Prévias: ${participante.cirurgias_previas}
+Medicamentos: ${participante.medicamentos}
+Doenças Cerebrais: ${participante.doencas_cerebrais}
+Fraturas: ${participante.fraturas}
+Dores Anginosas: ${participante.dores_anginosas}
+Risco: ${participante.risco.toUpperCase()}
+Observações: ${participante.observacoes}`);
+            }
+        }
+
+        // Editar participante
+        function editarParticipante(id) {
+            alert('Funcionalidade de edição será implementada em breve.');
+        }
+
+        // Novo evento
+        function novoEvento() {
+            alert('Funcionalidade de criação de eventos será implementada em breve.');
+        }
+
+        // Enviar notificação
+        function enviarNotificacao() {
+            const tipo = document.getElementById('notificacao-tipo').value;
+            const titulo = document.getElementById('notificacao-titulo').value;
+            const mensagem = document.getElementById('notificacao-mensagem').value;
+            const email = document.getElementById('enviar-email').checked;
+            const whatsapp = document.getElementById('enviar-whatsapp').checked;
+            
+            if (!titulo || !mensagem) {
+                alert('Por favor, preencha o título e a mensagem.');
+                return;
+            }
+            
+            alert(`Notificação enviada com sucesso!
+Tipo: ${tipo}
+Título: ${titulo}
+Mensagem: ${mensagem}
+Enviado por: ${email ? 'E-mail' : ''}${email && whatsapp ? ' e ' : ''}${whatsapp ? 'WhatsApp' : ''}`);
+            
+            document.getElementById('notificacao-titulo').value = '';
+            document.getElementById('notificacao-mensagem').value = '';
+        }
+
+        // Salvar configurações
+        function salvarConfiguracoes() {
+            const nome = document.getElementById('config-nome').value;
+            const email = document.getElementById('config-email').value;
+            const senha = document.getElementById('config-senha').value;
+            const senhaConfirma = document.getElementById('config-senha-confirma').value;
+            
+            if (senha && senha !== senhaConfirma) {
+                alert('As senhas não coincidem.');
+                return;
+            }
+            
+            document.getElementById('admin-name').textContent = nome;
+            
+            alert('Configurações salvas com sucesso!');
+            
+            document.getElementById('config-senha').value = '';
+            document.getElementById('config-senha-confirma').value = '';
+        }
+
+        // Funções para alternar entre as seções
+        function showDashboard() {
+            document.getElementById('dashboard-content').style.display = 'block';
+            document.getElementById('participantes-content').style.display = 'none';
+            document.getElementById('eventos-content').style.display = 'none';
+            document.getElementById('notificacoes-content').style.display = 'none';
+            document.getElementById('configuracoes-content').style.display = 'none';
+            
+            // Atualizar classe ativa
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.sidebar .nav-link:nth-child(1)').classList.add('active');
+        }
+
+        function showParticipantes() {
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('participantes-content').style.display = 'block';
+            document.getElementById('eventos-content').style.display = 'none';
+            document.getElementById('notificacoes-content').style.display = 'none';
+            document.getElementById('configuracoes-content').style.display = 'none';
+            
+            // Atualizar classe ativa
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.sidebar .nav-link:nth-child(2)').classList.add('active');
+        }
+
+        function showEventos() {
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('participantes-content').style.display = 'none';
+            document.getElementById('eventos-content').style.display = 'block';
+            document.getElementById('notificacoes-content').style.display = 'none';
+            document.getElementById('configuracoes-content').style.display = 'none';
+            
+            // Atualizar classe ativa
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.sidebar .nav-link:nth-child(3)').classList.add('active');
+        }
+
+        function showNotificacoes() {
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('participantes-content').style.display = 'none';
+            document.getElementById('eventos-content').style.display = 'none';
+            document.getElementById('notificacoes-content').style.display = 'block';
+            document.getElementById('configuracoes-content').style.display = 'none';
+            
+            // Atualizar classe ativa
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.sidebar .nav-link:nth-child(4)').classList.add('active');
+        }
+
+        function showConfiguracoes() {
+            document.getElementById('dashboard-content').style.display = 'none';
+            document.getElementById('participantes-content').style.display = 'none';
+            document.getElementById('eventos-content').style.display = 'none';
+            document.getElementById('notificacoes-content').style.display = 'none';
+            document.getElementById('configuracoes-content').style.display = 'block';
+            
+            // Atualizar classe ativa
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector('.sidebar .nav-link:nth-child(5)').classList.add('active');
+        }
+    </script>
+</body>
+</html>
