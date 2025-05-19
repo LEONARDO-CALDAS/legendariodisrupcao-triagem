@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Sistema de Triagem Médica Legendários Disrupção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #ff6600;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .admin-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: #ff6600;
+            border-color: #ff6600;
+        }
+        .btn-primary:hover {
+            background-color: #e65c00;
+            border-color: #e65c00;
+        }
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .risk-verde {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .risk-amarelo {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .risk-vermelho {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Sistema de Triagem Médica Legendários Disrupção</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="triagem.html">Formulário</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="admin.html">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-section" id="loginSection">
+            <h2 class="text-center">Acesso Administrativo</h2>
+            <p class="text-center mb-4">Faça login para acessar o painel administrativo.</p>
+            
+            <div class="login-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Usuário</label>
+                    <input type="text" class="form-control" id="username" placeholder="Digite seu usuário">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="password" placeholder="Digite sua senha">
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary" onclick="login()">Entrar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section" id="adminPanel" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Painel Administrativo</h2>
+                <div>
+                    <button class="btn btn-success me-2" onclick="exportData()">Exportar Dados</button>
+                    <button class="btn btn-warning me-2" onclick="clearAllData()">Limpar Todos os Dados</button>
+                    <button class="btn btn-danger" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="todos-tab" data-bs-toggle="tab" data-bs-target="#todos" type="button" role="tab" aria-controls="todos" aria-selected="true">Todos</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="verde-tab" data-bs-toggle="tab" data-bs-target="#verde" type="button" role="tab" aria-controls="verde" aria-selected="false">Verde</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="amarelo-tab" data-bs-toggle="tab" data-bs-target="#amarelo" type="button" role="tab" aria-controls="amarelo" aria-selected="false">Amarelo</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="vermelho-tab" data-bs-toggle="tab" data-bs-target="#vermelho" type="button" role="tab" aria-controls="vermelho" aria-selected="false">Vermelho</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="adminTabsContent">
+                <div class="tab-pane fade show active" id="todos" role="tabpanel" aria-labelledby="todos-tab">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="todosTable">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Idade</th>
+                                    <th>Risco</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="todosTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="verde" role="tabpanel" aria-labelledby="verde-tab">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="verdeTable">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Idade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="verdeTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="amarelo" role="tabpanel" aria-labelledby="amarelo-tab">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="amareloTable">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Idade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="amareloTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="vermelho" role="tabpanel" aria-labelledby="vermelho-tab">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="vermelhoTable">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Idade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vermelhoTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para detalhes do participante -->
+        <div class="modal fade" id="participanteModal" tabindex="-1" aria-labelledby="participanteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="participanteModalLabel">Detalhes do Participante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="participanteDetails">
+                        <!-- Detalhes serão inseridos via JavaScript -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para edição do participante -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Participante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editForm">
+                            <input type="hidden" id="edit_index">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_nome" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="edit_nome" name="edit_nome" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="edit_email" name="edit_email" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_telefone" class="form-label">Telefone (WhatsApp)</label>
+                                    <input type="tel" class="form-control" id="edit_telefone" name="edit_telefone" required>
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    <label for="edit_idade" class="form-label">Idade</label>
+                                    <input type="number" class="form-control" id="edit_idade" name="edit_idade" min="18" max="100" required>
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    <label for="edit_peso" class="form-label">Peso (kg)</label>
+                                    <input type="number" class="form-control" id="edit_peso" name="edit_peso" min="40" max="200" required>
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    <label for="edit_altura" class="form-label">Altura (cm)</label>
+                                    <input type="number" class="form-control" id="edit_altura" name="edit_altura" min="140" max="220" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_risco" class="form-label">Classificação de Risco</label>
+                                    <select class="form-select" id="edit_risco" name="edit_risco" required>
+                                        <option value="verde">Verde</option>
+                                        <option value="amarelo">Amarelo</option>
+                                        <option value="vermelho">Vermelho</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_problemas_cardiacos" class="form-label">Problemas Cardíacos</label>
+                                    <select class="form-select" id="edit_problemas_cardiacos" name="edit_problemas_cardiacos" required>
+                                        <option value="nao">Não</option>
+                                        <option value="sim">Sim</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3" id="edit_problemas_cardiacos_detalhes_div">
+                                    <label for="edit_problemas_cardiacos_detalhes" class="form-label">Detalhes dos Problemas Cardíacos</label>
+                                    <textarea class="form-control" id="edit_problemas_cardiacos_detalhes" name="edit_problemas_cardiacos_detalhes" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="edit_observacoes" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="edit_observacoes" name="edit_observacoes" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="saveEdit()">Salvar Alterações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmação para exclusão -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteConfirmModalLabel">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir este participante?</p>
+                        <p><strong>Nome:</strong> <span id="delete_nome"></span></p>
+                        <p><strong>E-mail:</strong> <span id="delete_email"></span></p>
+                        <input type="hidden" id="delete_index">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Sistema de Triagem Médica Legendários Disrupção</h5>
+                    <p>Sistema de triagem médica para participantes de desafios de alta intensidade.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Credenciais de acesso (em uma aplicação real, isso seria verificado no servidor)
+        const adminCredentials = {
+            username: 'admin',
+            password: 'admin2025'
+        };
+
+        // Função de login
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadData();
+            } else {
+                alert('Usuário ou senha incorretos!');
+            }
+        }
+
+        // Função de logout
+        function logout() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Carregar dados do localStorage
+        function loadData() {
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            
+            // Limpar tabelas
+            document.getElementById('todosTableBody').innerHTML = '';
+            document.getElementById('verdeTableBody').innerHTML = '';
+            document.getElementById('amareloTableBody').innerHTML = '';
+            document.getElementById('vermelhoTableBody').innerHTML = '';
+            
+            // Preencher tabelas
+            submissions.forEach((submission, index) => {
+                // Tabela Todos
+                const rowTodos = document.createElement('tr');
+                rowTodos.innerHTML = `
+                    <td>${submission.nome || 'N/A'}</td>
+                    <td>${submission.email || 'N/A'}</td>
+                    <td>${submission.telefone || 'N/A'}</td>
+                    <td>${submission.idade || 'N/A'}</td>
+                    <td><span class="risk-${submission.risco}">${submission.risco.toUpperCase()}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-info" onclick="viewDetails(${index})">Detalhes</button>
+                        <button class="btn btn-sm btn-warning" onclick="editParticipant(${index})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteParticipant(${index})">Excluir</button>
+                    </td>
+                `;
+                document.getElementById('todosTableBody').appendChild(rowTodos);
+                
+                // Tabelas por categoria de risco
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${submission.nome || 'N/A'}</td>
+                    <td>${submission.email || 'N/A'}</td>
+                    <td>${submission.telefone || 'N/A'}</td>
+                    <td>${submission.idade || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-info" onclick="viewDetails(${index})">Detalhes</button>
+                        <button class="btn btn-sm btn-warning" onclick="editParticipant(${index})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteParticipant(${index})">Excluir</button>
+                    </td>
+                `;
+                
+                if (submission.risco === 'verde') {
+                    document.getElementById('verdeTableBody').appendChild(row.cloneNode(true));
+                } else if (submission.risco === 'amarelo') {
+                    document.getElementById('amareloTableBody').appendChild(row.cloneNode(true));
+                } else if (submission.risco === 'vermelho') {
+                    document.getElementById('vermelhoTableBody').appendChild(row.cloneNode(true));
+                }
+            });
+        }
+
+        // Visualizar detalhes do participante
+        function viewDetails(index) {
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            const submission = submissions[index];
+            
+            if (!submission) {
+                alert('Participante não encontrado!');
+                return;
+            }
+            
+            let detailsHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Informações Pessoais</h5>
+                        <p><strong>Nome:</strong> ${submission.nome || 'N/A'}</p>
+                        <p><strong>E-mail:</strong> ${submission.email || 'N/A'}</p>
+                        <p><strong>Telefone:</strong> ${submission.telefone || 'N/A'}</p>
+                        <p><strong>Idade:</strong> ${submission.idade || 'N/A'}</p>
+                        <p><strong>Peso:</strong> ${submission.peso || 'N/A'} kg</p>
+                        <p><strong>Altura:</strong> ${submission.altura || 'N/A'} cm</p>
+                        <p><strong>Classificação de Risco:</strong> <span class="risk-${submission.risco}">${submission.risco.toUpperCase()}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Histórico Médico</h5>
+                        <p><strong>Problemas Cardíacos:</strong> ${submission.problemas_cardiacos === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.problemas_cardiacos === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.problemas_cardiacos_detalhes || 'N/A'}</p>` : ''}
+                        
+                        <p><strong>Cirurgias Prévias:</strong> ${submission.cirurgias_previas === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.cirurgias_previas === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.cirurgias_previas_detalhes || 'N/A'}</p>` : ''}
+                        
+                        <p><strong>Medicamentos:</strong> ${submission.medicamentos === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.medicamentos === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.medicamentos_detalhes || 'N/A'}</p>` : ''}
+                        
+                        <p><strong>Doenças Cerebrais:</strong> ${submission.doencas_cerebrais === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.doencas_cerebrais === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.doencas_cerebrais_detalhes || 'N/A'}</p>` : ''}
+                        
+                        <p><strong>Fraturas Recentes:</strong> ${submission.fraturas === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.fraturas === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.fraturas_detalhes || 'N/A'}</p>` : ''}
+                        
+                        <p><strong>Dores Anginosas:</strong> ${submission.dores_anginosas === 'sim' ? 'Sim' : 'Não'}</p>
+                        ${submission.dores_anginosas === 'sim' ? `<p><strong>Detalhes:</strong> ${submission.dores_anginosas_detalhes || 'N/A'}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5>Observações Adicionais</h5>
+                        <p>${submission.observacoes || 'Nenhuma observação adicional.'}</p>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12 text-end">
+                        <button class="btn btn-warning" onclick="editParticipant(${index})" data-bs-dismiss="modal">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteParticipant(${index})" data-bs-dismiss="modal">Excluir</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('participanteDetails').innerHTML = detailsHTML;
+            
+            const modal = new bootstrap.Modal(document.getElementById('participanteModal'));
+            modal.show();
+        }
+
+        // Editar participante
+        function editParticipant(index) {
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            const submission = submissions[index];
+            
+            if (!submission) {
+                alert('Participante não encontrado!');
+                return;
+            }
+            
+            // Preencher formulário de edição
+            document.getElementById('edit_index').value = index;
+            document.getElementById('edit_nome').value = submission.nome || '';
+            document.getElementById('edit_email').value = submission.email || '';
+            document.getElementById('edit_telefone').value = submission.telefone || '';
+            document.getElementById('edit_idade').value = submission.idade || '';
+            document.getElementById('edit_peso').value = submission.peso || '';
+            document.getElementById('edit_altura').value = submission.altura || '';
+            document.getElementById('edit_risco').value = submission.risco || 'verde';
+            document.getElementById('edit_problemas_cardiacos').value = submission.problemas_cardiacos || 'nao';
+            document.getElementById('edit_problemas_cardiacos_detalhes').value = submission.problemas_cardiacos_detalhes || '';
+            document.getElementById('edit_observacoes').value = submission.observacoes || '';
+            
+            // Mostrar/ocultar campos de detalhes
+            document.getElementById('edit_problemas_cardiacos_detalhes_div').style.display = 
+                submission.problemas_cardiacos === 'sim' ? 'block' : 'none';
+            
+            // Adicionar evento para mostrar/ocultar campos de detalhes
+            document.getElementById('edit_problemas_cardiacos').addEventListener('change', function() {
+                document.getElementById('edit_problemas_cardiacos_detalhes_div').style.display = 
+                    this.value === 'sim' ? 'block' : 'none';
+            });
+            
+            // Mostrar modal de edição
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+
+        // Salvar edição
+        function saveEdit() {
+            const index = document.getElementById('edit_index').value;
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            
+            if (index >= submissions.length) {
+                alert('Erro ao salvar: participante não encontrado!');
+                return;
+            }
+            
+            // Atualizar dados
+            submissions[index].nome = document.getElementById('edit_nome').value;
+            submissions[index].email = document.getElementById('edit_email').value;
+            submissions[index].telefone = document.getElementById('edit_telefone').value;
+            submissions[index].idade = document.getElementById('edit_idade').value;
+            submissions[index].peso = document.getElementById('edit_peso').value;
+            submissions[index].altura = document.getElementById('edit_altura').value;
+            submissions[index].risco = document.getElementById('edit_risco').value;
+            submissions[index].problemas_cardiacos = document.getElementById('edit_problemas_cardiacos').value;
+            submissions[index].problemas_cardiacos_detalhes = document.getElementById('edit_problemas_cardiacos_detalhes').value;
+            submissions[index].observacoes = document.getElementById('edit_observacoes').value;
+            
+            // Salvar no localStorage
+            localStorage.setItem('triagemSubmissions', JSON.stringify(submissions));
+            
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+            
+            // Recarregar dados
+            loadData();
+            
+            // Mostrar mensagem de sucesso
+            alert('Participante atualizado com sucesso!');
+        }
+
+        // Excluir participante (mostrar confirmação)
+        function deleteParticipant(index) {
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            const submission = submissions[index];
+            
+            if (!submission) {
+                alert('Participante não encontrado!');
+                return;
+            }
+            
+            // Preencher modal de confirmação
+            document.getElementById('delete_index').value = index;
+            document.getElementById('delete_nome').textContent = submission.nome || 'N/A';
+            document.getElementById('delete_email').textContent = submission.email || 'N/A';
+            
+            // Mostrar modal de confirmação
+            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        // Confirmar exclusão
+        function confirmDelete() {
+            const index = document.getElementById('delete_index').value;
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            
+            if (index >= submissions.length) {
+                alert('Erro ao excluir: participante não encontrado!');
+                return;
+            }
+            
+            // Remover participante
+            submissions.splice(index, 1);
+            
+            // Salvar no localStorage
+            localStorage.setItem('triagemSubmissions', JSON.stringify(submissions));
+            
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            modal.hide();
+            
+            // Recarregar dados
+            loadData();
+            
+            // Mostrar mensagem de sucesso
+            alert('Participante excluído com sucesso!');
+        }
+
+        // Limpar todos os dados
+        function clearAllData() {
+            if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita!')) {
+                localStorage.removeItem('triagemSubmissions');
+                loadData();
+                alert('Todos os dados foram removidos com sucesso!');
+            }
+        }
+
+        // Exportar dados
+        function exportData() {
+            const submissions = JSON.parse(localStorage.getItem('triagemSubmissions') || '[]');
+            
+            if (submissions.length === 0) {
+                alert('Não há dados para exportar!');
+                return;
+            }
+            
+            // Converter para CSV
+            let csv = 'Nome,Email,Telefone,Idade,Peso,Altura,Risco,Problemas Cardíacos,Cirurgias Prévias,Medicamentos,Doenças Cerebrais,Fraturas,Dores Anginosas,Observações\n';
+            
+            submissions.forEach(submission => {
+                csv += `"${submission.nome || ''}","${submission.email || ''}","${submission.telefone || ''}","${submission.idade || ''}","${submission.peso || ''}","${submission.altura || ''}","${submission.risco || ''}","${submission.problemas_cardiacos || ''}","${submission.cirurgias_previas || ''}","${submission.medicamentos || ''}","${submission.doencas_cerebrais || ''}","${submission.fraturas || ''}","${submission.dores_anginosas || ''}","${submission.observacoes || ''}"\n`;
+            });
+            
+            // Criar link para download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'triagem_medica_export.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
